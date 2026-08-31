@@ -1,1 +1,0 @@
-# idle-kingdom-web1
