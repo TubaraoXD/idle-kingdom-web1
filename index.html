@@ -1,29 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>Idle Kingdom</title>
 		<style>
-html, body, #canvas {
+html, body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+	height: 100%;
+}
+
+/* Reserva uma faixa fixa embaixo pro banner de anúncio DE VERDADE (fora
+   do jogo) — o canvas do Godot ocupa o resto da tela, acima dela. Assim
+   não precisa alinhar pixel a pixel com as coordenadas internas do jogo. */
+#game-area {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: var(--ad-banner-height, 0px);
+}
+
+#canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	border: 0;
 }
 
-body {
-	color: white;
-	background-color: black;
-	overflow: hidden;
-	touch-action: none;
-}
-
-#canvas {
-	display: block;
-}
-
 #canvas:focus {
 	outline: none;
+}
+
+/* ---------- FAIXA DO BANNER DE ANÚNCIO (Adsterra) ---------- */
+#ad-banner-slot {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: var(--ad-banner-height, 0px);
+	background-color: #111;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
 }
 
 #status, #status-splash, #status-progress {
@@ -95,23 +122,72 @@ body {
 
 	</head>
 	<body>
-		<canvas id="canvas">
-			Your browser does not support the canvas tag.
-		</canvas>
+		<div id="game-area">
+			<canvas id="canvas">
+				Your browser does not support the canvas tag.
+			</canvas>
 
-		<noscript>
-			Your browser does not support JavaScript.
-		</noscript>
+			<noscript>
+				Your browser does not support JavaScript.
+			</noscript>
 
-		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
-			<progress id="status-progress"></progress>
-			<div id="status-notice"></div>
+			<div id="status">
+				<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
+				<progress id="status-progress"></progress>
+				<div id="status-notice"></div>
+			</div>
 		</div>
+
+		<!-- ======================================================
+		     ESPAÇO DO BANNER (Adsterra) — cole o código de "Banner"
+		     da sua conta Adsterra aqui dentro. Assim que colar um
+		     código de verdade, mude ADSTERRA_BANNER_CONFIGURED pra
+		     true e ajuste --ad-banner-height (px) pro tamanho do
+		     banner que a Adsterra te der (normalmente 50 ou 90px).
+		     ====================================================== -->
+		<div id="ad-banner-slot">
+			<!-- COLE_AQUI_O_CODIGO_DE_BANNER_DA_ADSTERRA -->
+		</div>
+
+		<script>
+			// Ajuste esse valor pro tamanho real do banner (0 = escondido,
+			// sem banner nenhum reservando espaço — é o estado enquanto
+			// não tiver um código de verdade colado acima).
+			document.documentElement.style.setProperty('--ad-banner-height', '0px');
+
+			// Flag central: true assim que houver um código de Banner real
+			// colado acima. Controla se o jogo mostra o mock por baixo dele.
+			window.ADSTERRA_BANNER_CONFIGURED = false;
+
+			// URL de "Direct Link"/SmartLink da Adsterra pra anúncios sob
+			// demanda (intersticial ao fechar telas, recompensado ao pedir
+			// um boost). Troque pela sua URL real quando tiver uma.
+			window.ADSTERRA_DIRECT_LINK_URL = "";
+
+			// Chamado pelo jogo (via JavaScriptBridge) quando quer mostrar
+			// um anúncio "sob demanda". Retorna true se conseguiu abrir um
+			// anúncio de verdade; false faz o jogo cair pro popup de teste.
+			window.showAdsterraOffer = function () {
+				if (!window.ADSTERRA_DIRECT_LINK_URL) {
+					return false;
+				}
+				window.open(window.ADSTERRA_DIRECT_LINK_URL, '_blank');
+				return true;
+			};
+		</script>
+
+		<!-- ======================================================
+		     SOCIAL BAR (Adsterra) — cole o <script> de "Social Bar"
+		     da sua conta aqui embaixo, antes do fechamento do body.
+		     Esse formato roda sozinho (a Adsterra decide quando
+		     mostrar, baseado nos cliques do jogador na página) —
+		     não precisa chamar nada do jogo pra ele funcionar.
+		     ====================================================== -->
+		<!-- COLE_AQUI_O_CODIGO_DE_SOCIAL_BAR_DA_ADSTERRA -->
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":13152080,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":13152464,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
